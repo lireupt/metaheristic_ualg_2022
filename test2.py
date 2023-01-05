@@ -4,24 +4,49 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib import colors
 from matplotlib import rcParams
+from matplotlib.animation import PillowWriter
+from itertools import chain
 
+#Generate the plot
 def generatePlot(board_with_probabilities, turn_counter):
-    name = "plot" + str(turn_counter)
+   # name = "plot" + str(turn_counter)
+   # cmap = 'cividis'
+    l, =plt.plot([],[],'k-')
+    fig = plt.figure()
 
-    cmap = colors.ListedColormap(['slateblue','red','lightgrey']) if turn_counter >= 100 else 'plasma'        
+    #Map to represnt probabilities
+    cmap = colors.ListedColormap(['slateblue','red','lightgrey']) if turn_counter >= 100 else 'plasma'    
 
     ax = sns.heatmap(board_with_probabilities , linewidth = 0.5 , cmap = cmap, cbar=False)
     plt.legend([],[], frameon=False)
     ax.set_xticklabels(['1','2','3','4','5','6','7','8', '9', '10'])
     ax.set_yticklabels(['10','9','8','7','6','5','4','3', '2', '1'])
     rcParams['figure.figsize'] = 11,11
-    # plt.imshow(board_with_probabilities, cmap='plasma', linewidth = 0.5)
-    plt.savefig(name)
+    #plt.imshow(board_with_probabilities, cmap='plasma', linewidth = 0.5)
+    #plt.savefig(name)
+
+    #MAKE A INTERECTIVE GIF 
+    metada = dict(title='Battleship-Metaheurist_UALG_2022', artist='group7')
+    writer = PillowWriter(fps=15, metadata=metada)
+
+    xList=[]
+    yList=[]
+
+    with writer.saving(fig, "Battleship-Metaheurist_UALG_2022.gif", 100):
+        for xVal in np.linspace(-5,5,1):
+            xList.append(xVal)
+            yList.append(xVal)
+
+            l.set_data(xList,yList)
+            writer.grab_frame()
+
 
 def saveCSV(board_with_probabilities, turn_counter):
     name = "textfile" + str(turn_counter) + ".csv"
     np.savetxt(name, board_with_probabilities, delimiter=",")
 
+
+#Generates ships randomly inside the board
 def generateRandomBoard():
     opponents_board = np.full((10, 10), 0)
     ships = [5,4,3,3,2]
@@ -63,6 +88,7 @@ def generateRandomBoard():
 
     return(opponents_board)
 
+#Find possible locations summarize by the ship size
 def possibibleLocationsProbability(board_with_hits, board_with_misses, length_of_the_ship):
     list_of_probabilities = []
     
@@ -73,6 +99,7 @@ def possibibleLocationsProbability(board_with_hits, board_with_misses, length_of
             # State where hits happened
             positions_with_hits = []
             empty_slot_counter = 0
+
             # Check if the elements of a list all correspond to 0s, and if they do create a matrix where that segment has a certain probabiliity
             for element in positions_to_consider:
                 if board_with_misses[row,element] == 0:
@@ -124,6 +151,7 @@ def possibibleLocationsProbability(board_with_hits, board_with_misses, length_of
 
     return(final_matrix)
 
+#Generate probabilties for all ships
 def generateProbabilitiesForAllShips(board_with_hits, board_with_misses):
     final = np.full((10, 10), 0)
     ships = [5,4,3,3,2]
@@ -132,12 +160,21 @@ def generateProbabilitiesForAllShips(board_with_hits, board_with_misses):
         final = np.add(final, probabilites)
     return(final)
 
+#Next move function
 def generateNextMove(board_with_probabilities):
     return(np.unravel_index(board_with_probabilities.argmax(), board_with_probabilities.shape))
 
+#Function bot
 def bot (opponents_board, board_with_hits, board_with_misses, turn_counter, successful_hits):
     if successful_hits >= 17 or turn_counter>=100:
         generatePlot((board_with_hits+board_with_misses), turn_counter + 100)
+        print("number of turns:" + str(turn_counter),
+              "\nnumber of hits:" + str(successful_hits))
+
+        #TODO:A rever os tiros falhados "\nnumber of misses:" + str(board_with_misses) 
+        #res = len(list(set(chain(*board_with_misses)))== 2)
+        # #print (str(res))
+
         return (turn_counter)
 
     board_with_probabilities = generateProbabilitiesForAllShips(board_with_hits, board_with_misses)
@@ -146,7 +183,9 @@ def bot (opponents_board, board_with_hits, board_with_misses, turn_counter, succ
     col = nextHit[1]
     generatePlot(board_with_probabilities, turn_counter)
     generatePlot((board_with_hits+board_with_misses), turn_counter + 100)
-    # saveCSV(board_with_probabilities, turn_counter)
+    
+    #TODO:ver o cs para dentro de um ficheiro unico para depois fazer comparações e valores 
+    #saveCSV(board_with_probabilities, turn_counter)
 
     if opponents_board[row,col] == 1:    
         successful_hits += 1
