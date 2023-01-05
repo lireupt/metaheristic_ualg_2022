@@ -26,7 +26,7 @@ boardProbabilities = np.zeros((10, 10))
 #generate board game
 #def generatePlot(board):
 def generatePlot(board, counter):
-    #name = "plot" + str(counter)
+    name = "plot" + str(counter)
     #name = "plot" 
     cmap = 'cividis'
     l, =plt.plot([],[],'k-')
