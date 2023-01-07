@@ -26,6 +26,7 @@ def generatePlot(board, counter):
     ax.set_yticklabels(['10', '9', '8', '7', '6', '5', '4', '3', '2', '1'])
     rcParams['figure.figsize'] = 11, 11
     plt.savefig(name)
+    
 
 
 listOfAvailableMoves = []
