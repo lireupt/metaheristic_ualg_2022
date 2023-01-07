@@ -1,10 +1,14 @@
+###
+#UALG 2022/23
+#Metaheuristic
+#a78830 - Helder Oliveira
+#a78279 - Luciano Neves
+
 import numpy as np
 import random
 import matplotlib.pyplot as plt
 import seaborn as sns
-from matplotlib import colors
 from matplotlib import rcParams
-from matplotlib.animation import PillowWriter
 
 #Board alocation pieces
 opponentsBoard = np.zeros((10, 10))
@@ -22,41 +26,37 @@ opponentsBoard[1, 5:7] = 1
 visitedBoard = np.zeros((10, 10))
 boardProbabilities = np.zeros((10, 10))
 
-
 #generate board game
 #def generatePlot(board):
 def generatePlot(board, counter):
     name = "plot" + str(counter)
-    #name = "plot" 
     cmap = 'cividis'
-    l, =plt.plot([],[],'k-')
-    fig = plt.figure()
+    
+    #l, =plt.plot([],[],'k-')
+    #fig = plt.figure()
 
     ax = sns.heatmap(board, linewidth=0.5, cmap=cmap, cbar=False)
     plt.legend([], [], frameon=False)
     ax.set_xticklabels(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
     ax.set_yticklabels(['10', '9', '8', '7', '6', '5', '4', '3', '2', '1'])
-
     rcParams['figure.figsize'] = 11, 11
-    #plt.savefig(name)
+    plt.savefig(name)
     #plt.show()
 
     #MAKE A INTERECTIVE GIF 
-    metada = dict(title='Battleship-Metaheurist_UALG_2022', artist='group7')
-    writer = PillowWriter(fps=15, metadata=metada)
+    # metada = dict(title='Battleship-Metaheurist_UALG_2022', artist='group7')
+    # writer = PillowWriter(fps=5, metadata=metada)
 
-    xList=[]
-    yList=[]
+    # xList=[]
+    # yList=[]
 
-    with writer.saving(fig, "Battleship-Metaheurist_UALG_2022.gif", 100):
-        for xVal in np.linspace(-5,5,1):
-            xList.append(xVal)
-            yList.append(xVal)
+    # with writer.saving(fig, "Battleship-Metaheurist_UALG_2022.gif", 100):
+    #     for xVal in np.linspace(-5,5,1):
+    #         xList.append(xVal)
+    #         yList.append(xVal)
 
-            l.set_data(xList,yList)
-            writer.grab_frame()
-
-
+    #         l.set_data(xList,yList)
+    #         writer.grab_frame()
 
 #Posistions board
 listOfAvailableMoves = []
@@ -90,7 +90,6 @@ def randomGuessBot(opponentsBoard, visitedBoard, counter, successfulHits, listOf
 
 #randomGuessBot(opponentsBoard, visitedBoard, 0 , 0 , listOfAvailableMoves)
 
-
 def generateRandomMove(listOfAvailableMoves):
     return (random.choice(listOfAvailableMoves))
 
@@ -98,7 +97,7 @@ def generateRandomMove(listOfAvailableMoves):
 def generateNextMove(boardProbabilities):
     return (np.unravel_index(boardProbabilities.argmax(), boardProbabilities.shape))
 
-#Agressive scan for every boats neighbourhood
+# #Agressive scan for every boats neighbourhood
 def createProbabilities(boardProbabilities, lastHit):
     if lastHit[0] >= 0 and lastHit[0] <= 9 and lastHit[1]+1 >= 0 and lastHit[1]+1 <= 9:
         if boardProbabilities[lastHit[0], lastHit[1]+1] == 0:
@@ -177,8 +176,8 @@ def randomProbability(opponentsBoard, turnCounter, succesfulHits, listOfAvailabl
 randomProbability(opponentsBoard, 0, 0, listOfAvailableMoves,
                        boardProbabilities, -1, 0, visitedBoard)
 
-#def generateRandomMove(listOfAvailableMoves):
- #   return (random.choice(listOfAvailableMoves))
+# def generateRandomMove(listOfAvailableMoves):
+#     return (random.choice(listOfAvailableMoves))
 
 
 #print(opponentsBoard)
