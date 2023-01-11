@@ -1,150 +1,499 @@
-import numpy as np
-import random
-import matplotlib.pyplot as plt
-import seaborn as sns
-from matplotlib import colors
-from matplotlib import rcParams
+'''
+=================================================================================================
+#################################################################################################
+############################## Documentation: BattleShip Game ###################################
+#################################################################################################
+=================================================================================================
+============= 1.Creating class for randomly position and placing of vessles =====================
 
-#Board alocation pieces
-opponentsBoard = np.zeros((10, 10))
-opponentsBoard[0:5, 1] = 1
-opponentsBoard[3, 4:7] = 1
-opponentsBoard[5:9, 8] = 1
-opponentsBoard[6, 0:3] = 1
-opponentsBoard[9, 6:8] = 1
-visitedBoard = np.zeros((10, 10))
-boardWithProbabilities = np.zeros((10, 10))
+ define class with name Vessle
+ create method 'ship' with agrguments size and mainShipList
+ import random module
+ 
+ create a while loop
+ create random X coordinate , Y coordinate and O for orientation
+ create a shipList for current the ships being created
+ create mainShipList for all the ships being created for later check of overlaps
+ if O == 0 then change X part of the coordinate till the ship size is full filled
+    then check for over laps
+ if O == 1 then change Y part of the coordinate till the ship size is ful filled
+    then check for over laps
+ if ships over lap do the above steps over again
+ if not return ship list for placement of the Grid
+==================================================================================================
+================================== 2. Playing Game 100 Times =====================================
 
-#generate board game
-def generatePlot(board, counter):
-    name = "plot" + str(counter)
-    cmap = 'plasma'
+ Loop 100 times using for loop in range from 1 to 101
 
-    ax = sns.heatmap(board, linewidth=0.5, cmap=cmap, cbar=False)
-    plt.legend([], [], frameon=False)
-    ax.set_xticklabels(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
-    ax.set_yticklabels(['10', '9', '8', '7', '6', '5', '4', '3', '2', '1'])
-    rcParams['figure.figsize'] = 11, 11
-    plt.savefig(name)
+======================================= 2.1. Pygame Grid  ========================================
+
+ module import random pygame and time
+ initialize pygame display
+ initialize and color GameBoard(light sky blue)
+ for every X coordinate draw a line length 400 and make spacing between then 20 using for loop
+ for every X coordinate draw a line length 400 and make spacing between then 20 using for loop
+
+============================== 2.2. Class Call named Vessels =====================================
+
+ Vessels = Vessle()
+ making instance of class
+ PTship = Vessels.ship(2, mainShipList)
+     Draw PTship color Blue
+ Cruiser = Vessels.ship(3, mainShipList)
+     Draw Cruiser color Blue
+ Destroyer = Vessels.ship(4, mainShipList)
+     Draw Destroyer color Blue
+ Battleship = Vessels.ship(5, mainShipList)
+     Draw Battleship color Blue 
+ AircraftCarrier = Vessels.ship(6, mainShipList)
+     Draw AircraftCarrier color Blue
+
+======================================= 2.3. Random Search ======================================
+
+ while count <= 4
+ declare and initialize variable
+    count, shotCounts, CurrentShot_L, Total_S_List, random x and random y
+    create random x and y
+    put them in a list
+    count += 1
+    check if list has been created before
+    if yes = break and create another list
+    if no
+         check if the list belongs to the list of one of the vessels
+         if yes do local search and destroy vessel
+
+         if no check create another list and do the loop again
+         
+========================================= 2.4. Local Search =====================================
+
+ if list created on section 2.3. belongs to one of the ships  and is not in the total
+ successful shots we put it in currentshot list and go in to local search
+
+ now check for alignment
+
+ if horizontal
+     while(length of currentshotlist != length of vessel)
+         if left square is part of vessel and is not in current shot list
+             we color that list
+             and keep going until we go out of the vessel list
+ if Vertical
+     while(length of currentshotlist != length of vessel)
+         if right square is part of vessel and is not in current shot list
+             we color that list
+             and keep going until we get all the co-ordinates of that vessel
+
+ This local search goes for all the ships no matter the size
+ and alignment
+=========================================== // ==================================================
+*************************************************************************************************
+'''
+#************************************************************************************************
+#================================================================================================
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Class for Vessle Production ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#================================================================================================
+class Vessel(object):
     
+    def ship(self, size, mainShipList):
+        
+        import random
+        
+        overLap = True # Over lap boolean
+        
+        while(overLap):
+            
+            #List(Tuple) for holding coordinate spaces
+            myTuple = (20,40,60,80,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380)
+            
+            
+            RandomX = myTuple[int(random.uniform(0, 19))]# Random number for x coordinate
+            RandomY = myTuple[int(random.uniform(0, 19))]# Random number for y coordinate
+            RandomO = int(random.uniform(0, 2))# Random number for ship alignment 
+
+            shipList = []# Holds current Vessle list
+
+            
+            z = 0
+            a = 0
+            
+            if(RandomO == 0): #0 means Horizontal alignment
+                while(z < size):
+                    if((RandomX + 20*size) <= 400):
+                        shipList.extend([(RandomX+a, RandomY)])
+                    
+                    elif((RandomX + 20*size) > 400):
+                        shipList.extend([(RandomX-a, RandomY)])
+                    
+                    a += 20
+                    z += 1
+                    
+            elif(RandomO == 1):#1 means Vertical alignment
+                while(z < size):
+                    if((RandomY + 20*size) <= 400):
+                        shipList.extend([(RandomX, RandomY+a)])
+                    
+                    elif((RandomY + 20*size) > 400):
+                        shipList.extend([(RandomX, RandomY-a)])
+                    
+                    a += 20
+                    z += 1
+#===================================================================
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#======================= Check for overlaps ========================               
+            for i in range(0, len(shipList)):
+                for j in range(0, len(mainShipList)):
+                    if(shipList[i] == mainShipList[j]):
+                        overLap = True
+                        break
+                    else:
+                        overLap = False
+                if(overLap):
+                    break
+                                    
+        return shipList
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#============================= // ==================================
+#*******************************************************************
+#*******************************************************************
+#===================================================================
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#======================= Game Grid =================================
+for h in range(1, 101): #
+    import pygame 
+    import random
+    import time
+    pygame.display.init()
+    GameBoard = pygame.display.set_mode((425, 425))
+    GameBoard.fill((0,191,255))
+            
+    x = 20# spacing on x direction
+    y = 20# spacing on y direction
+
+    for i in range(20):
+        pygame.draw.line(GameBoard, (255,255,255),(20,y),(400,y))
+        pygame.draw.line(GameBoard, (255,255,255),(x,20),(x,400))
+        y += 20
+        x += 20
+    
+    #===================================================================
+    #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    #============================ Patrol Ship ==========================
+    mainShipList = [(0,0)]
+
+    Vessels = Vessel() # Calling class Vessle 
+
+    PTship = Vessels.ship(2, mainShipList)
+    for i in range(0, len(PTship)):
+        X = PTship[i][0]
+        Y = PTship[i][1]
+        GameBoard.fill((0,0,255), rect=(X,Y,20,20))    
+    mainShipList.extend(PTship)
+    #===================================================================
+    #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    #=========================== Cruiser ===============================
+    Cruiser = Vessels.ship(3, mainShipList)
+    for i in range(0, len(Cruiser)):
+        X = Cruiser[i][0]
+        Y = Cruiser[i][1]
+        GameBoard.fill((0,0,255), rect=(X,Y,20,20))
+    mainShipList.extend(Cruiser)
+    #===================================================================
+    #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    #========================== Destroyer ==============================
+    Destroyer = Vessels.ship(4, mainShipList)
+    for i in range(0, len(Destroyer)):
+        X = Destroyer[i][0]
+        Y = Destroyer[i][1]
+        GameBoard.fill((0,0,255), rect=(X,Y,20,20))
+    mainShipList.extend(Destroyer)
+    #===================================================================
+    #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    #======================= BattleShip ================================
+    Battleship = Vessels.ship(5, mainShipList)
+    for i in range(0, len(Battleship)):
+        X = Battleship[i][0]
+        Y = Battleship[i][1]
+        GameBoard.fill((0,0,255), rect=(X,Y,20,20))
+    mainShipList.extend(Battleship)
+    #===================================================================
+    #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    #===================== Aircraft Carrier ============================
+    AircraftCarrier = Vessels.ship(6, mainShipList)
+    for i in range(0, len(AircraftCarrier)):
+        X = AircraftCarrier[i][0]
+        Y = AircraftCarrier[i][1]
+        GameBoard.fill((0,0,255), rect=(X,Y,20,20))
+    mainShipList.extend(AircraftCarrier)
+    #===================================================================
+    pygame.display.update()
+    #===================================================================  
+
+    Scount = 0 # count for checking if all the vessels be hit or not
+    shotCount = 0 # Total random shots needed to take down the fleet
+
+    # check for the random shot not to be shot at that place again
+    CurrentShot_L = [] 
+    
+    # To not to shoot the vessel already been taken/contains all successful shots
+    Total_S_List = [] 
+
+    Tuple = (20,40,60,80,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380)
+    
+    #=======================================================================================    
+    while(Scount <= 4) :
+           
+        X = Tuple[int(random.uniform(0, 19))]
+        Y = Tuple[int(random.uniform(0, 19))]
+        RandomShot = [] # Contains random x and random y co-ordinates as a tuple
+        CurrentShot_L = [] # Reseting this list every loop 
+        RandomShot.extend([(X, Y)])
+        shotCount += 1
+        if(RandomShot in Total_S_List):
+            break
+        elif(not(RandomShot in Total_S_List)):
+        #===================================================================================       
+            if(RandomShot[0] in PTship) and (not(RandomShot[0] in Total_S_List)):
+                GameBoard.fill((255,0,0), rect=(X,Y,20,20))
+                CurrentShot_L.extend([(X, Y)])
+                Total_S_List.extend([(X, Y)])
+                    
+                   
+                if((X-20, Y) in PTship) or ((X+20, Y) in PTship):
+                    while(len(CurrentShot_L) != len(PTship)):
+                        for j in range(1):
+                            i = Tuple[j]
+                            if((X-i, Y) in PTship) and (not((X-i, Y) in CurrentShot_L)):
+                                GameBoard.fill((255,0,0), rect=(X-i,Y,20,20))
+                                CurrentShot_L.extend([(X-i, Y)])
+                                Total_S_List.extend([(X-i, Y)])
+                                pygame.display.update()
+                                
+                                    
+                            elif((X+i, Y) in PTship) and (not((X+i, Y) in CurrentShot_L)):
+                                    
+                                GameBoard.fill((255,0,0), rect=(X+i,Y,20,20))
+                                pygame.display.update()
+                                    
+                                CurrentShot_L.extend([(X+i, Y)])
+                                Total_S_List.extend([(X+i, Y)])
+                              
+                    
+                            
+                elif((X, Y-20) in PTship) or ((X, Y+20) in PTship):
+                    while(len(CurrentShot_L) != len(PTship)):
+                        for j in range(1):
+                            i = Tuple[j]
+                            if((X, Y-i) in PTship) and (not((X, Y-i) in CurrentShot_L)):
+                                GameBoard.fill((255,0,0), rect=(X,Y-i,20,20))
+                                CurrentShot_L.extend([(X, Y-i)])
+                                Total_S_List.extend([(X, Y-i)])
+                                pygame.display.update()
+                                
+                                    
+                            elif((X, Y+i) in PTship) and (not((X, Y+i) in CurrentShot_L)):
+                                GameBoard.fill((255,0,0), rect=(X,Y+i,20,20))
+                                CurrentShot_L.extend([(X, Y+i)])
+                                Total_S_List.extend([(X, Y+i)])
+                                pygame.display.update()
+                                
+                Scount += 1
+        #=======================================================================================                        
+            if(RandomShot[0] in Cruiser) and (not(RandomShot[0] in Total_S_List)):
+                    GameBoard.fill((255,0,0), rect=(X,Y,20,20))
+                    CurrentShot_L.extend([(X, Y)])
+                    Total_S_List.extend([(X, Y)])
+                    
+                    
+                    if((X-20, Y) in Cruiser) or ((X+20, Y) in Cruiser):
+                        while(len(CurrentShot_L) != len(Cruiser)):
+                            
+                            
+                            for j in range(2):
+                                i = Tuple[j]
+                                if((X-i, Y) in Cruiser) and (not((X-i, Y) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X-i,Y,20,20))
+                                    CurrentShot_L.extend([(X-i, Y)])
+                                    Total_S_List.extend([(X-i, Y)])
+                                    pygame.display.update()
+                                    
+                                elif((X+i, Y) in Cruiser) and (not((X+i, Y) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X+i,Y,20,20))
+                                    CurrentShot_L.extend([(X+i, Y)])
+                                    Total_S_List.extend([(X+i, Y)])
+                                    pygame.display.update()
+                            
+                                
+                    elif((X, Y-20) in Cruiser) or ((X, Y+20) in Cruiser):
+                        while(len(CurrentShot_L) != len(Cruiser)):
+                            
+                            
+                            for j in range(2):
+                                i = Tuple[j]
+                                if((X, Y-i) in Cruiser) and (not((X, Y-i) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X,Y-i,20,20))
+                                    CurrentShot_L.extend([(X, Y-i)])
+                                    Total_S_List.extend([(X, Y-i)])
+                                    pygame.display.update()
+                                    
+                                elif((X, Y+i) in Cruiser) and (not((X, Y+i) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X,Y+i,20,20))
+                                    CurrentShot_L.extend([(X, Y+i)])
+                                    Total_S_List.extend([(X, Y+i)])
+                                    pygame.display.update()
+                                    
+                    Scount += 1
+        #=======================================================================================
+            if(RandomShot[0] in Destroyer) and (not(RandomShot[0] in Total_S_List)):
+                    GameBoard.fill((255,0,0), rect=(X,Y,20,20))
+                    CurrentShot_L.extend([(X, Y)])
+                    Total_S_List.extend([(X, Y)])
+                    
+                    
+                    if((X-20, Y) in Destroyer) or ((X+20, Y) in Destroyer):
+                        while(len(CurrentShot_L) != len(Destroyer)):
+                            
+                            
+                            for j in range(3):
+                                i = Tuple[j]
+                                if((X-i, Y) in Destroyer) and (not((X-i, Y) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X-i,Y,20,20))
+                                    CurrentShot_L.extend([(X-i, Y)])
+                                    Total_S_List.extend([(X-i, Y)])
+                                    pygame.display.update()
+                                    
+                                    
+                                elif((X+i, Y) in Destroyer) and (not((X+i, Y) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X+i,Y,20,20))
+                                    CurrentShot_L.extend([(X+i, Y)])
+                                    Total_S_List.extend([(X+i, Y)])
+                                    pygame.display.update()
+                                    
+                        
+                    
+                    elif((X, Y-20) in Destroyer) or ((X, Y+20) in Destroyer):
+                        while(len(CurrentShot_L) != len(Destroyer)):
+                            
+                            for j in range(3):
+                                i = Tuple[j]
+                                if((X, Y-i) in Destroyer) and (not((X, Y-i) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X,Y-i,20,20))
+                                    CurrentShot_L.extend([(X, Y-i)])
+                                    Total_S_List.extend([(X, Y-i)])
+                                    pygame.display.update()
+                                    
+                                    
+                                elif((X, Y+i) in Destroyer) and (not((X, Y+i) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X,Y+i,20,20))
+                                    CurrentShot_L.extend([(X, Y+i)])
+                                    Total_S_List.extend([(X, Y+i)])
+                                    pygame.display.update()
+                                    
+                    Scount += 1
+        #============================================================================================
+            if(RandomShot[0] in Battleship) and (not(RandomShot[0] in Total_S_List)):
+                    GameBoard.fill((255,0,0), rect=(X,Y,20,20))
+                    CurrentShot_L.extend([(X, Y)])
+                    Total_S_List.extend(CurrentShot_L)
+                    
+                    
+                    if((X-20, Y) in Battleship) or ((X+20, Y) in Battleship):
+                        while(len(CurrentShot_L) != len(Battleship)):
+                            
+                            for j in range(4):
+                                i = Tuple[j]
+                                
+                                if((X-i, Y) in Battleship) and (not((X-i, Y) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X-i,Y,20,20))
+                                    CurrentShot_L.extend([(X-i, Y)])
+                                    Total_S_List.extend([(X-i, Y)])
+                                    pygame.display.update()
+                        
+                                    
+                                elif((X+i, Y) in Battleship) and (not((X+i, Y) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X+i,Y,20,20))
+                                    CurrentShot_L.extend([(X+i, Y)])
+                                    Total_S_List.extend([(X+i, Y)])
+                                    pygame.display.update()
+                        
+                    
+                    elif((X, Y-20) in Battleship) or ((X, Y+20) in Battleship):
+                        while(len(CurrentShot_L) != len(Battleship)):
+                            
+                            for j in range(4):
+                                i = Tuple[j]
+                                if((X, Y-i) in Battleship) and (not((X, Y-i) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X,Y-i,20,20))
+                                    CurrentShot_L.extend([(X, Y-i)])
+                                    Total_S_List.extend([(X, Y-i)])
+                                    pygame.display.update()
+                                    
+                                    
+                                elif((X, Y+i) in Battleship) and (not((X, Y+i) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X,Y+i,20,20))
+                                    CurrentShot_L.extend([(X, Y+i)])
+                                    Total_S_List.extend([(X, Y+i)])
+                                    pygame.display.update()
+                                    
+                    Scount += 1
+        #==============================================================================================
+            if(RandomShot[0] in AircraftCarrier) and (not(RandomShot[0] in Total_S_List)):
+                    GameBoard.fill((255,0,0), rect=(X,Y,20,20))
+                    CurrentShot_L.extend([(X, Y)])
+                    Total_S_List.extend(CurrentShot_L)
+                    
+                    
+                    if((X-20, Y) in AircraftCarrier) or ((X+20, Y) in AircraftCarrier):
+                        while(len(CurrentShot_L) != len(AircraftCarrier)):
+                            
+                            for j in range(5):
+                                i = Tuple[j]
+                                if((X-i, Y) in AircraftCarrier) and (not((X-i, Y) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X-i,Y,20,20))
+                                    CurrentShot_L.extend([(X-i, Y)])
+                                    Total_S_List.extend([(X-i, Y)])
+                                    pygame.display.update()
+                                    
+                                    
+                                elif((X+i, Y) in AircraftCarrier) and (not((X+i, Y) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X+i,Y,20,20))
+                                    CurrentShot_L.extend([(X+i, Y)])
+                                    Total_S_List.extend([(X+i, Y)])
+                                    pygame.display.update()
+                        
+                    
+                    elif((X, Y-20) in AircraftCarrier) or ((X, Y+20) in AircraftCarrier):
+                        while(len(CurrentShot_L) != len(AircraftCarrier)):
+                            
+                            for j in range(5):
+                                i = Tuple[j]
+                                if((X, Y-i) in AircraftCarrier) and (not((X, Y-i) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X,Y-i,20,20))
+                                    CurrentShot_L.extend([(X, Y-i)])
+                                    Total_S_List.extend([(X, Y-i)])
+                                    pygame.display.update()
+                                    
+                                    
+                                elif((X, Y+i) in AircraftCarrier) and (not((X, Y+i) in CurrentShot_L)):
+                                    GameBoard.fill((255,0,0), rect=(X,Y+i,20,20))
+                                    CurrentShot_L.extend([(X, Y+i)])
+                                    Total_S_List.extend([(X, Y+i)])
+                                    pygame.display.update()
+                    Scount += 1
+        #================================================================================================                            
+
+            elif(not(RandomShot[0] in mainShipList)):
+                   X = RandomShot[0][0]
+                   Y = RandomShot[0][1]
+                   GameBoard.fill((0,0,0), rect=(X,Y,20,20))
+                   pygame.display.update()
+
+        
+        time.sleep(0.004) # Slowing down ship construction and shooting each loop 
+        
+    print("In Game number ",h ,"It took ", shotCount, " shots to sink all Vessle.")
+    time.sleep(0.5) # Pauses every time loop ends by 0.5 seconds    
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#======================================== THE END ======================================================
 
 
-listOfAvailableMoves = []
-for i in range(0, 10):
-    for j in range(0, 10):
-        listOfAvailableMoves.append(str(i)+str(j))
 
 
-def randomGuessBot(opponentsBoard, visitedBoard, counter, successfulHits, listOfAvailableMoves):
-    if successfulHits >= 17:
-        print("number of turns:" + str(counter),
-              "number of hits:" + str(successfulHits))
-        generatePlot(visitedBoard, counter)
-        return (True)
-    random_num = random.choice(listOfAvailableMoves)
-    listOfAvailableMoves.remove(random_num)
-    row = int(random_num[0])
-    col = int(random_num[1])
-    generatePlot(visitedBoard, counter)
-
-    if opponentsBoard[row, col] == 1:
-        successfulHits += 1
-        visitedBoard[row, col] = 1
-    else:
-        visitedBoard[row, col] = 2
-
-    randomGuessBot(opponentsBoard, visitedBoard, counter +
-                   1, successfulHits, listOfAvailableMoves)
-
-
-def generateRandomMove(listOfAvailableMoves):
-    return (random.choice(listOfAvailableMoves))
-
-
-def generateNextMove(boardWithProbabilities):
-    return (np.unravel_index(boardWithProbabilities.argmax(), boardWithProbabilities.shape))
-
-#Agressive scan for every boats
-def createProbabilitiesBoard(boardWithProbabilities, lastHit):
-    if lastHit[0] >= 0 and lastHit[0] <= 9 and lastHit[1]+1 >= 0 and lastHit[1]+1 <= 9:
-        if boardWithProbabilities[lastHit[0], lastHit[1]+1] == 0:
-            boardWithProbabilities[lastHit[0], lastHit[1]+1] = 0.25
-
-    if lastHit[0] >= 0 and lastHit[0] <= 9 and lastHit[1]-1 >= 0 and lastHit[1]-1 <= 9:
-        if boardWithProbabilities[lastHit[0], lastHit[1]-1] == 0:
-            boardWithProbabilities[lastHit[0], lastHit[1]-1] = 0.25
-
-    if lastHit[0]+1 >= 0 and lastHit[0]+1 <= 9 and lastHit[1] >= 0 and lastHit[1] <= 9:
-        if boardWithProbabilities[lastHit[0]+1, lastHit[1]] == 0:
-            boardWithProbabilities[lastHit[0]+1, lastHit[1]] = 0.25
-
-    if lastHit[0]-1 > 0 and lastHit[0] <= 9 and lastHit[1]-1 >= 0 and lastHit[1] <= 9:
-        if boardWithProbabilities[lastHit[0]-1, lastHit[1]] == 0:
-            boardWithProbabilities[lastHit[0]-1, lastHit[1]] = 0.25
-
-    return (boardWithProbabilities)
-
-
-def randomUsingProbability(opponentsBoard, turnCounter, succesfulHits, listOfAvailableMoves, boardWithProbabilities, lastHit, missed, visitedBoard):
-    if succesfulHits >= 17 or turnCounter >= 100:
-        print("Number of turns: " + str(turnCounter),
-              "Hits:" + str(succesfulHits))
-        generatePlot(visitedBoard, turnCounter+100)
-        return
-
-    if (lastHit == -1):  # last hit was miss && don't know have a place to check, so we take random guess
-        print("random", turnCounter)
-        random_num = generateRandomMove(listOfAvailableMoves)
-        listOfAvailableMoves.remove(random_num)
-        row = int(random_num[0])
-        col = int(random_num[1])
-        generatePlot(visitedBoard, turnCounter+100)
-
-        if opponentsBoard[row, col] == 1:
-            succesfulHits += 1
-            lastHit = [row, col]
-            visitedBoard[row, col] = 1
-            boardWithProbabilities[row, col] = -10  # random hit
-            visitedBoard[row, col] = 1
-            createProbabilitiesBoard(boardWithProbabilities, lastHit)
-
-        else:
-            boardWithProbabilities[row, col] = -1  # miss
-            visitedBoard[row, col] = 2
-
-    else:
-        nextHit = generateNextMove(boardWithProbabilities)
-        position = str(nextHit[0])+str(nextHit[1])
-        if position in listOfAvailableMoves:  # should always be true
-            listOfAvailableMoves.remove(position)
-            row = nextHit[0]
-            col = nextHit[1]
-            generatePlot(visitedBoard, turnCounter+100)
-            if boardWithProbabilities[row, col] == 0:  # out of guesses
-                lastHit = -1
-
-            boardWithProbabilities[row, col] = -1
-
-            if opponentsBoard[row, col] == 1:
-                succesfulHits += 1
-                lastHit = [row, col]
-                visitedBoard[row, col] = 1
-                boardWithProbabilities[row, col] = -100  # rated move hit
-                visitedBoard[row, col] = 1
-                missed = 0
-            else:
-                missed = 1
-                visitedBoard[row, col] = 2
-
-    randomUsingProbability(opponentsBoard, turnCounter+1, succesfulHits,
-                           listOfAvailableMoves, boardWithProbabilities, lastHit, missed, visitedBoard)
-
-
-randomUsingProbability(opponentsBoard, 0, 0, listOfAvailableMoves,
-                       boardWithProbabilities, -1, 0, visitedBoard)
-
-
-# randomGuessBot(opponentsBoard, visitedBoard, 0, 0, listOfAvailableMoves)
-# print(listOfAvailableMoves)
-#generatePlot(opponentsBoard)
-# print(opponentsBoard)
