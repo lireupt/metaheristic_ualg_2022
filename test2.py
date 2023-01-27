@@ -59,21 +59,35 @@ import os
 #    print('Your array is empty')
 # else:
 #    print('Your array is not empty')
-import numpy as np
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from matplotlib import colors
-from matplotlib import rcParams
-from matplotlib.animation import PillowWriter
-import time 
-from itertools import chain
-import random
+# import numpy as np
+# import numpy as np
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+# from matplotlib import colors
+# from matplotlib import rcParams
+# from matplotlib.animation import PillowWriter
+# import time 
+# from itertools import chain
+# import random
 
-data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+# data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-mean = np.mean(data)
-plt.plot(data)
-plt.plot([0, len(data)], [mean, mean])
+# mean = np.mean(data)
+# plt.plot(data)
+# plt.plot([0, len(data)], [mean, mean])
 
-plt.show()
+# plt.show()
+
+def heuristic_function(hits, misses, effective_shots, total_shots):
+    hit_rate = hits / effective_shots
+    miss_rate = misses / total_shots
+    return (hit_rate * 0.7) + (miss_rate * -0.3)
+
+#exemplo para testar a função heurística
+hits = 10
+misses = 5
+effective_shots = 15
+total_shots = 20
+print(heuristic_function(hits, misses, effective_shots, total_shots))
+
+# resultado esperado: 0.4 (hit_rate é 2/3 e miss_rate é 1/4, então (2/3 * 0.7) + (1/4 * -0.3) = 0.4)
