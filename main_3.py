@@ -1,7 +1,6 @@
 import random
 import pandas as pd
 
-
 def heuristic_function(s, n, a, e, b, c):
     if n == 0:
         return 0
