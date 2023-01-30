@@ -1,93 +1,70 @@
 import random
-import os
+import math
+import matplotlib.pyplot as plt
 
-# counter = 0
-# filename = open('file{}.csv','w')
-# while os.path.isfile(filename.format(counter)):
-#     counter += 1
-# filename = filename.format(counter)
+# Constants
+n_planes = 5
+capacity = 6
+origin = (0, 0)
+destinations = [(100, 100), (200, 200), (300, 300)]
 
-# i = 0
-# while os.path.exists('output%s.csv' % i):
-#     i += 1
+def distance(coord1, coord2):
+    return math.sqrt((coord1[0] - coord2[0])**2 + (coord1[1] - coord2[1])**2)
 
-# filename = open('output%s.csv' % i,'w')
+def calculate_cost(route):
+    total_distance = 0
+    for i in range(0, len(route), 2):
+        total_distance += distance(route[i], route[i+1])
+    return total_distance
 
-# l1 = []
-# l2 = []
+def generate_initial_solution():
+    route = []
+    for i in range(n_planes):
+        route.append(origin)
+        route.append(random.choice(destinations))
+    return route
 
-# #create 1000 choices for l1 and l2
+def make_random_move(route):
+    i = random.randint(0, len(route) - 1)
+    j = random.randint(0, len(route) - 1)
+    route[i], route[j] = route[j], route[i]
+    return route
 
-# l = "ABCDEFGH"
+def simulated_annealing(route, T):
+    while T > 1e-3:
+        new_route = make_random_move(route)
+        delta = calculate_cost(new_route) - calculate_cost(route)
+        if delta < 0:
+            route = new_route
+        else:
+            p = math.exp(-delta / T)
+            if random.uniform(0, 1) < p:
+                route = new_route
+        T *= 0.995
+    return route
 
-# for i in range (1000):
-#     l1.append(random.choice(l))
-#     l2.append(random.choice(l))
+def plot_solution(route):
+    x = [coord[0] for coord in route]
+    y = [coord[1] for coord in route]
+    plt.plot(x, y, '-o')
+    for coord in destinations:
+        plt.scatter(coord[0], coord[1], color='red')
+        plt.scatter(origin[0], origin[1], color='blue')
+        plt.title("Airplane Routing Optimization Solution")
+        plt.xlabel("X")
+        plt.ylabel("Y")
+        plt.show()
 
-# #count the number of times a letter was picked
-# L1={}
-# L2={}
+def main():
+    route = generate_initial_solution()
+    final_route = simulated_annealing(route, 1000)
+    print("Final route:", final_route)
+    print("Total cost:", calculate_cost(final_route))
+    plot_solution(final_route)
 
-# for x in l1:
-#     if x not in L1:
-#         L1[x] = 1
-#     else:
-#         L1[x] += 1
+if __name__ == '__main__':
+    main()
 
-# for x in l2:
-#     if x not in L2:
-#         L2[x] = 1
-#     else:
-#         L2[x] += 1
 
-# #format data for output        
-# filename.write((''+','+'l1'+','+'l2'+'\n'))
-# for x in list(l):
-#     filename.write(x+',')
-#     val = str(L1[x])
-#     filename.write(val+',')
-#     val2 = str(L2[x])
-#     filename.write(val2+'\n')
-
-# filename.close()
-
-# import numpy as np
-
-# emp_arr = np.array([1])
-# flag = not np.any(emp_arr)
-# if flag:
-#    print('Your array is empty')
-# else:
-#    print('Your array is not empty')
-# import numpy as np
-# import numpy as np
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-# from matplotlib import colors
-# from matplotlib import rcParams
-# from matplotlib.animation import PillowWriter
-# import time 
-# from itertools import chain
-# import random
-
-# data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-# mean = np.mean(data)
-# plt.plot(data)
-# plt.plot([0, len(data)], [mean, mean])
-
-# plt.show()
-
-def heuristic_function(hits, misses, effective_shots, total_shots):
-    hit_rate = hits / effective_shots
-    miss_rate = misses / total_shots
-    return (hit_rate * 0.7) + (miss_rate * -0.3)
-
-#exemplo para testar a função heurística
-hits = 10
-misses = 5
-effective_shots = 15
-total_shots = 20
-print(heuristic_function(hits, misses, effective_shots, total_shots))
-
-# resultado esperado: 0.4 (hit_rate é 2/3 e miss_rate é 1/4, então (2/3 * 0.7) + (1/4 * -0.3) = 0.4)
+    origin = (21.962100281510644, -157.97050724922886)
+destinations = [(21.362371733736136, -157.9603367767048)]
